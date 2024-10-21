@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as RechartsPrimitive from 'recharts'
-import { NameType, Payload, ValueType } from 'recharts/types/component/DefaultTooltipContent'
 
 import { cn } from '../../lib/utils'
+import { ReactElementType } from '@renderer/types/ReactElementType'
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: '', dark: '.dark' } as const
@@ -38,7 +38,7 @@ const ChartContainer = React.forwardRef<
   React.ComponentProps<'div'> & {
     config: ChartConfig
     children: React.ComponentProps<typeof RechartsPrimitive.ResponsiveContainer>['children']
-  }
+  } & ReactElementType
 >(({ id, className, children, config, ...props }, ref) => {
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, '')}`
