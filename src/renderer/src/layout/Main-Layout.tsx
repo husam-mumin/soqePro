@@ -201,7 +201,7 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
               <Separator orientation="vertical" className="mr-2 h-4" />
             </nav>
           </header>
-          <div className="m-4 w-auto h-auto">{children}</div>
+          <div className="m-4 w-auto flex">{children}</div>
         </SidebarInset>
       </SidebarProvider>
     </div>
