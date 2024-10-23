@@ -1,5 +1,8 @@
 export type productGroup = {
   id: number
+  productName: string
+  proudctDescription: string
+  BrandId: string
   enteryAt: Date
   provider: number
   cost: number
@@ -12,15 +15,16 @@ export type productGroup_product = {
 
 export type product = {
   id: number
-  name: string
-  createat: Date
-  entryBy: number // user.id
+  color: number
+  size: string
+  product_code: number
+  price: number
+  quantity: number
 }
 
-export type product_barcode = {
-  id: number
-  product_id: number
-  barcode: string
+export type brand = {
+  brandid: number
+  brandName: string
 }
 
 export type colors = {
@@ -31,9 +35,4 @@ export type colors = {
 export type Size = {
   product_id: number
   size: string
-}
-
-export type product_varient = {
-  product_id: number
-  varient: string
 }

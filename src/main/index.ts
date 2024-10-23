@@ -4,6 +4,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { PosPrinter, PosPrintData, PosPrintOptions } from 'electron-pos-printer'
+import { error } from 'console'
 
 function createWindow(): void {
   // Create the browser window.
@@ -78,43 +79,28 @@ app.on('window-all-closed', () => {
   }
 })
 
-const labelprinter = () => {
-  const widthByCM = 3.5
-  const heightByCM = 2.5
-  const cmToPixel = 37.795
-  const width = widthByCM * cmToPixel
-  const height = heightByCM * cmToPixel
-
-  const window = new BrowserWindow({
-    width: widthByCM * cmToPixel,
-    height: heightByCM * cmToPixel,
-    show: true
-  })
-
-  window.loadFile('./Reports/label.html')
-
-  window.webContents.print({
-    pageSize: { height: height, width: width },
-    margins: { marginType: 'default' }
-  })
-}
-
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
 const options: PosPrintOptions = {
-  margin: '2 0 2 0',
-  copies: 1,
-  printerName: 'Xprinter XP-237B', // write the print name in the computer
-  silent: true, // print with out ask
-  pageSize: '44mm' // page size
+  margin: '0 0 0 0',
+  copies: 2,
+  boolean: false,
+  pageSize: { height: 10, width: 30 } // page size
 }
 
 const data: PosPrintData[] = [
   {
     type: 'text', // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
     value: 'SAMPLE HEADING',
-    style: { fontWeight: '700', fontSize: '8px' }
+    style: {
+      fontWeight: '800',
+      fontSize: '12px',
+      textAlign: 'center',
+      marginBottom: '-10px',
+      position: 'relative',
+      zIndex: '10'
+    }
   },
   {
     type: 'barCode',
@@ -122,10 +108,27 @@ const data: PosPrintData[] = [
     height: '40', // height of barcode, applicable only to bar and QR codes
     width: '1', // width of barcode, applicable only to bar and QR codes
     displayValue: true, // Display value below barcode
-    fontsize: 12
+    position: 'center'
+  },
+  {
+    type: 'text',
+    value: 'name or product (sz)',
+    style: {
+      marginTop: '-12px',
+      fontSize: '14px',
+      textAlign: 'center',
+      position: 'relative',
+      zIndex: '10'
+    }
   }
 ]
 
 function printReus(): void {
-  labelprinter()
+  PosPrinter.print(data, options)
+    .then(() => {
+      console.log()
+    })
+    .catch((error) => {
+      console.error(error)
+    })
 }

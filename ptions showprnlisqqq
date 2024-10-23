@@ -1,0 +1,36 @@
+[33mcommit 198231a5df07ac3dc31e759a9dbe34ae9b680c47[m[33m ([m[1;35mrefs/stash[m[33m)[m
+Merge: 1ab3327 fe73870
+Author: husam-mumin <husammumin@gmail.com>
+Date:   Tue Oct 22 23:51:29 2024 +0200
+
+    WIP on Feature: 1ab3327 add POS receipt feature ! need to improve
+
+[33mcommit fe738705634f3fb68a970fd176ec7e7f5ca9a20f[m
+Author: husam-mumin <husammumin@gmail.com>
+Date:   Tue Oct 22 23:51:29 2024 +0200
+
+    index on Feature: 1ab3327 add POS receipt feature ! need to improve
+
+[33mcommit 1ab332730f146d54da1bab59d0a3145c86809de2[m[33m ([m[1;36mHEAD[m[33m, [m[1;32mFeature[m[33m)[m
+Author: husam-mumin <husammumin@gmail.com>
+Date:   Tue Oct 22 00:57:26 2024 +0200
+
+    add POS receipt feature ! need to improve
+
+[33mcommit bd7bef650aaf0e9be92e1b54b26e760ca8be9152[m
+Author: husam-mumin <husammumin@gmail.com>
+Date:   Mon Oct 21 21:47:31 2024 +0200
+
+    add simple add and show Users
+
+[33mcommit 550e97d97c2055ee6fab1e8a68a6089dc362bca3[m[33m ([m[1;31morigin/Feature[m[33m)[m
+Author: husam-mumin <husammumin@gmail.com>
+Date:   Mon Oct 21 14:43:06 2024 +0200
+
+    add Main layout
+
+[33mcommit 3bc1ca03f644d74af906caa9b4e91cc765c26118[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mproduction[m[33m, [m[1;32mmain[m[33m)[m
+Author: husam-mumin <husammumin@gmail.com>
+Date:   Mon Oct 21 08:45:56 2024 +0200
+
+    Initialize the Project
