@@ -1,7 +1,8 @@
 export type User_type = {
   id: number
-  name: string
-  phnoe: string
+  username: string
+  password: string
+  phone: string
   createat: Date
   lastLogin: Date
   permission: 'admin' | 'seller' | 'counter'

@@ -8,13 +8,9 @@ export type productGroup = {
   cost: number
 }
 
-export type productGroup_product = {
-  productGroupID: number
-  productID: number
-}
-
 export type product = {
   id: number
+  productGroupID: number
   color: number
   size: string
   product_code: number

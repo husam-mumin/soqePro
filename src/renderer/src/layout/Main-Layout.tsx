@@ -29,6 +29,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarInset,
   SidebarMenu,
   SidebarMenuButton,
@@ -87,6 +88,17 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
     <div className="max-w-screen">
       <SidebarProvider defaultOpen={false}>
         <Sidebar collapsible="icon">
+          <SidebarHeader className="flex justify-center items-center">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <h1 className="text-xl font-bold py-4">
+                    B<span className="">Ben Omora</span>
+                  </h1>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarHeader>
           <SidebarContent>
             <SidebarGroup>
               <SidebarGroupLabel>Pages</SidebarGroupLabel>

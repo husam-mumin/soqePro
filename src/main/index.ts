@@ -1,34 +1,30 @@
-import { Bar } from 'recharts'
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { PosPrinter, PosPrintData, PosPrintOptions } from 'electron-pos-printer'
-import { error } from 'console'
+import { PrinterNameList } from './helpers/getPrintersNames'
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
-    fullscreen: true,
     show: true,
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: true,
+      contextIsolation: true
     }
-  })
-
-  ipcMain.on('printRe', () => {
-    printReus()
   })
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
+
+  ipcMain.handle('getPrinters', () => PrinterNameList())
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
@@ -41,6 +37,15 @@ function createWindow(): void {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+  }
+}
+
+function loginWindow(): void {
+  const loadinWindow = new BrowserWindow({ width: 400, height: 600 })
+  if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
+    loadinWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/login.html`)
+  } else {
+    loadinWindow.loadFile(join(__dirname, '../renderer/login.html'))
   }
 }
 
@@ -58,10 +63,10 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-
   createWindow()
+
+  const auth = false
+  if (auth) loginWindow()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -81,54 +86,3 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
-
-const options: PosPrintOptions = {
-  margin: '0 0 0 0',
-  copies: 2,
-  boolean: false,
-  pageSize: { height: 10, width: 30 } // page size
-}
-
-const data: PosPrintData[] = [
-  {
-    type: 'text', // 'text' | 'barCode' | 'qrCode' | 'image' | 'table
-    value: 'SAMPLE HEADING',
-    style: {
-      fontWeight: '800',
-      fontSize: '12px',
-      textAlign: 'center',
-      marginBottom: '-10px',
-      position: 'relative',
-      zIndex: '10'
-    }
-  },
-  {
-    type: 'barCode',
-    value: '023456789010',
-    height: '40', // height of barcode, applicable only to bar and QR codes
-    width: '1', // width of barcode, applicable only to bar and QR codes
-    displayValue: true, // Display value below barcode
-    position: 'center'
-  },
-  {
-    type: 'text',
-    value: 'name or product (sz)',
-    style: {
-      marginTop: '-12px',
-      fontSize: '14px',
-      textAlign: 'center',
-      position: 'relative',
-      zIndex: '10'
-    }
-  }
-]
-
-function printReus(): void {
-  PosPrinter.print(data, options)
-    .then(() => {
-      console.log()
-    })
-    .catch((error) => {
-      console.error(error)
-    })
-}

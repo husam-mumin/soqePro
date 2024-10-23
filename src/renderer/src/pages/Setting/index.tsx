@@ -1,6 +1,6 @@
-import { Button } from '@renderer/components/ui/button'
 import UsersSection from './components/UserTable/UsersSection'
 import AddUserDialog from './components/addUserDialog'
+import PrinterSelecter from './components/PrinterSelecter'
 
 export default function Setting(): JSX.Element {
   return (
@@ -9,6 +9,7 @@ export default function Setting(): JSX.Element {
         <AddUserDialog />
       </div>
       <UsersSection />
+      <PrinterSelecter />
     </div>
   )
 }

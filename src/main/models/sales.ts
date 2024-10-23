@@ -4,6 +4,7 @@ export type SaleTransaction = {
   paymentMethodID: number
   discount?: number
   customerID?: number
+  userId?: number
 }
 
 export type SaleTransaction_Product = {
