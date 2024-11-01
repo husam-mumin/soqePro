@@ -1,15 +1,16 @@
 import { ColumnDef } from '@tanstack/react-table'
 import TimeAgo from 'javascript-time-ago'
 import ar from 'javascript-time-ago/locale/en'
+import { usePermissionConverter } from '@renderer/lib/usePermissionConverter'
 
 export type User = {
-  id: number
-  username: string
-  phone: string
-  createat: Date
-  lastLogin: Date
+  id?: number
+  username?: string
+  phone?: string
+  lastLogin?: Date
+  createAt?: Date
   password?: string
-  permission: 'admin' | 'seller' | 'counter'
+  permission?: number
 }
 
 TimeAgo.addDefaultLocale(ar)
@@ -27,11 +28,18 @@ export const columns: () => ColumnDef<User>[] = () => {
     {
       accessorKey: 'lastLogin',
       header: 'last Login',
-      cell: (item) => <div>{timeAgo.format(item.row.getValue<Date>('lastLogin'))}</div>
+      cell: (item) => (
+        <div>
+          {item.row.getValue<Date>('lastLogin')
+            ? timeAgo.format(item.row.getValue<Date>('lastLogin'))
+            : 'not'}
+        </div>
+      )
     },
     {
       accessorKey: 'permission',
-      header: 'Permission'
+      header: 'Permission',
+      cell: (item) => <div>{usePermissionConverter(item.row.getValue<number>('permission'))}</div>
     }
   ]
 }

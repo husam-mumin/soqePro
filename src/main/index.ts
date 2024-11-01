@@ -1,30 +1,180 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
+import settings from 'electron-settings'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { PrinterNameList } from './helpers/getPrintersNames'
+import { getPermission, getUsers, insertUser, login } from './actions/user_action'
+import { User_type } from '../models/user'
+import {
+  deleteProduct,
+  getBrands,
+  getCategoris,
+  getProducts,
+  getProviders,
+  getShowProducts,
+  insertBrand,
+  insertCategory,
+  insertProduct,
+  insertProvider,
+  testProductCode
+} from './actions/product_action'
 
-function createWindow(): void {
+import { PosPrinter, PosPrintData, PosPrintOptions } from 'electron-pos-printer'
+import * as path from 'path'
+
+async function LabelPrinter(data: {
+  marketName?: string
+  copies: number
+  barcode: string
+  name: string
+  price: number
+}): Promise<void> {
+  const printerName = await getDefaultLabel()
+  const options: PosPrintOptions = {
+    preview: false,
+    margin: '0 0 0 0',
+    copies: data.copies,
+    boolean: true,
+    timeOutPerLine: 400,
+    printerName: printerName,
+    silent: true,
+    pageSize: '44mm' // page size
+  }
+
+  const ps: PosPrintData[] = [
+    {
+      type: 'text',
+      style: {
+        margin: '0 0 -8px 0',
+        zIndex: '10',
+        position: 'relative',
+        textAlign: 'center',
+        fontSize: '12px',
+        fontFamily: 'system-ui'
+      },
+      position: 'center',
+      value: data.marketName
+    },
+    {
+      type: 'barCode',
+      style: { zIndex: '1', backgroundColor: 'trans' },
+      position: 'center',
+      value: data.barcode,
+      displayValue: true,
+      height: '30',
+      width: '1',
+      fontsize: 8
+    },
+    {
+      type: 'text',
+      style: {
+        margin: '-12px 0 0 0',
+        zIndex: '10',
+        position: 'relative',
+        display: 'block',
+        fontSize: '11px',
+        fontFamily: 'system-ui'
+      },
+      value: data.name
+    },
+    {
+      type: 'text',
+      style: {
+        zIndex: '10',
+        position: 'absolute',
+        display: 'block',
+        right: '22px',
+        top: '66px',
+        fontSize: '12px',
+        fontFamily: 'system-ui'
+      },
+      position: 'center',
+      value: 'سعر:' + data.price
+    }
+  ]
+  PosPrinter.print(ps, options)
+    .then(console.log)
+    .catch((error) => {
+      console.error(error)
+    })
+}
+async function setDefaultLabel(data): Promise<void> {
+  await settings.set('defaultLabel', {
+    name: data
+  })
+}
+async function getDefaultLabel(): Promise<string> {
+  const data = await settings.get('defaultLabel.name')
+  if (!data) return ''
+  if (typeof data == 'string') return data
+  return ''
+}
+function createWindow(data: User_type): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: true,
     autoHideMenuBar: true,
-    titleBarStyle: 'hidden',
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: path.join(__dirname, '../preload/index.js'),
       sandbox: true,
       contextIsolation: true
     }
   })
 
+  ipcMain.removeHandler('getPrinters')
+  ipcMain.removeHandler('insertUser')
+  ipcMain.removeHandler('getUsers')
+  ipcMain.removeHandler('getPermissions')
+  ipcMain.removeHandler('getAuthUser')
+  ipcMain.removeHandler('getCategoris')
+  ipcMain.removeHandler('insertCategoris')
+  ipcMain.removeHandler('getbrand')
+  ipcMain.removeHandler('insertBrand')
+  ipcMain.removeHandler('insertProvider')
+  ipcMain.removeHandler('getProviders')
+  ipcMain.removeHandler('testProductCode')
+  ipcMain.removeHandler('insertProduct')
+  ipcMain.removeHandler('getProducts')
+  ipcMain.removeHandler('getShowProducts')
+  ipcMain.removeHandler('deleteProduct')
+  ipcMain.removeHandler('getDefaultLabel')
+  ipcMain.on('printLabel', (_, data) => {
+    LabelPrinter(data)
+  })
+  ipcMain.on('defaultLebal', (_, data) => {
+    console.log('work in main' + ' ' + data)
+
+    setDefaultLabel(data)
+  })
+  ipcMain.handle('getDefaultLabel', () => getDefaultLabel())
+  ipcMain.handle('deleteProduct', (_, id) => deleteProduct(id))
+  ipcMain.handle('getShowProducts', () => getShowProducts())
+  ipcMain.handle('getProducts', () => getProducts())
+  ipcMain.handle('insertProduct', (_, data) => insertProduct(data))
+  ipcMain.handle('testProductCode', (_, data) => testProductCode(data))
+  ipcMain.handle('getProviders', () => getProviders())
+  ipcMain.handle('insertProvider', (_, data) => insertProvider(data))
+  ipcMain.handle('insertBrand', (_, data) => insertBrand(data))
+  ipcMain.handle('getbrand', () => getBrands())
+  ipcMain.handle('getCategoris', () => getCategoris())
+  ipcMain.handle('insertCategoris', (_, data) => insertCategory(data))
+  ipcMain.handle('getPrinters', () => PrinterNameList())
+  ipcMain.handle('insertUser', (_, user) => insertUser(user))
+  ipcMain.handle('getUsers', () => getUsers())
+  ipcMain.handle('getPermissions', () => getPermission())
+
+  ipcMain.handle('getAuthUser', () => data)
+  ipcMain.on('logout', () => {
+    loginWindow()
+    mainWindow.close()
+    ipcMain.removeAllListeners()
+  })
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
-
-  ipcMain.handle('getPrinters', () => PrinterNameList())
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
@@ -36,17 +186,35 @@ function createWindow(): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
   }
 }
 
 function loginWindow(): void {
-  const loadinWindow = new BrowserWindow({ width: 400, height: 600 })
+  const loadinWindow = new BrowserWindow({
+    width: 400,
+    height: 600,
+    webPreferences: {
+      sandbox: true,
+      preload: path.join(__dirname, '../preload/login.js'),
+      contextIsolation: true
+    }
+  })
   if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
     loadinWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/login.html`)
   } else {
-    loadinWindow.loadFile(join(__dirname, '../renderer/login.html'))
+    loadinWindow.loadFile(path.join(__dirname, '../renderer/login.html'))
   }
+
+  ipcMain.handle('login', (_, user: User_type) => {
+    login({ username: user.username, password: user.password }).then((data) => {
+      if (!data) return
+
+      loadinWindow.close()
+      createWindow(data)
+      ipcMain.removeHandler('login')
+    })
+  })
 }
 
 // This method will be called when Electron has finished
@@ -63,15 +231,13 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  createWindow()
-
-  const auth = false
-  if (auth) loginWindow()
+  // createWindow()
+  loginWindow()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (BrowserWindow.getAllWindows().length === 0) loginWindow()
   })
 })
 

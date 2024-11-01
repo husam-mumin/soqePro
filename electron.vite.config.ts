@@ -4,9 +4,23 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    build: {
+      rollupOptions: {
+        external: ['electron-settings']
+      }
+    }
   },
   preload: {
+    build: {
+      rollupOptions: {
+        input: {
+          index: join(__dirname, './src/preload/index.ts'),
+          login: join(__dirname, './src/preload/login/login.ts'),
+          label: join(__dirname, './src/preload/static/label.ts')
+        }
+      }
+    },
     plugins: [externalizeDepsPlugin()]
   },
   renderer: {
@@ -14,7 +28,8 @@ export default defineConfig({
       rollupOptions: {
         input: {
           index: join(__dirname, './src/renderer/index.html'),
-          login: join(__dirname, './src/renderer/login.html')
+          login: join(__dirname, './src/renderer/login.html'),
+          label: join(__dirname, './src/renderer/static/label.html')
         }
       }
     },

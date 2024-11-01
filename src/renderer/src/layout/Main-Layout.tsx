@@ -40,13 +40,12 @@ import {
 } from '../components/ui/sidebar'
 import { ReactElementType } from '@renderer/types/ReactElementType'
 import { Link, useMatch } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { User } from '@renderer/pages/Setting/components/UserTable/column'
+import { usePermissionConverter } from '@renderer/lib/usePermissionConverter'
+import ConfirmationDialog from '@renderer/pages/Storage/components/ConfirmationDialog'
 // This is sample data.
 const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg'
-  },
   navMain: [
     {
       title: 'Home',
@@ -84,6 +83,14 @@ const data = {
 }
 
 export default function Main_layout({ children }: ReactElementType): JSX.Element {
+  const [user, setUser] = useState<User>({})
+  const [permission, setPermission] = useState<string>('')
+  useEffect(() => {
+    window.api.getAuthUser().then((user) => {
+      setUser(user)
+    })
+    if (user.permission) setPermission(usePermissionConverter(user.permission))
+  }, [user.id])
   return (
     <div className="max-w-screen">
       <SidebarProvider defaultOpen={false}>
@@ -146,12 +153,14 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
                       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                     >
                       <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarImage src={data.user.avatar} alt={data.user.name} />
-                        <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                        <AvatarImage src={''} alt={user.username} />
+                        <AvatarFallback className="rounded-lg">
+                          {user.username && user.username[0].toUpperCase()}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">{data.user.name}</span>
-                        <span className="truncate text-xs">{data.user.email}</span>
+                        <span className="truncate font-semibold">{user.username}</span>
+                        <span className="truncate text-xs">{permission}</span>
                       </div>
                       <ChevronsUpDown className="ml-auto size-4" />
                     </SidebarMenuButton>
@@ -165,12 +174,17 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
                     <DropdownMenuLabel className="p-0 font-normal">
                       <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                         <Avatar className="h-8 w-8 rounded-lg">
-                          <AvatarImage src={data.user.avatar} alt={data.user.name} />
-                          <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                          <AvatarImage src={''} title={user.username} alt={user.username} />
+                          <AvatarFallback className="rounded-lg">
+                            {user.username && user.username[0].toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
-                          <span className="truncate font-semibold">{data.user.name}</span>
-                          <span className="truncate text-xs">{data.user.email}</span>
+                          <span className="truncate font-semibold">{user.username}</span>
+                          {
+                            // todo fix permission show Problem}
+                          }
+                          <span className="truncate text-xs">{permission}</span>
                         </div>
                       </div>
                     </DropdownMenuLabel>
@@ -195,7 +209,11 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        window.api.logout()
+                      }}
+                    >
                       <LogOut />
                       Log out
                     </DropdownMenuItem>
@@ -216,6 +234,7 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
           <div className="m-4 w-auto flex">{children}</div>
         </SidebarInset>
       </SidebarProvider>
+      <ConfirmationDialog />
     </div>
   )
 }

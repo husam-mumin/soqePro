@@ -22,8 +22,13 @@ import {
 } from '@renderer/components/ui/select'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { User } from '../UserTable/column'
+import { useEffect, useState } from 'react'
 
-const permission = ['admin', 'seller', 'counter']
+export type Permissions = {
+  id: number
+  name: string
+}
 
 const formSchema = z
   .object({
@@ -40,10 +45,6 @@ const formSchema = z
   .refine((data) => data.password == data.confirm, {
     message: "Password don't match",
     path: ['confirm']
-  })
-  .refine((data) => permission.includes(data.permission), {
-    message: 'permission is Wrong',
-    path: ['permission']
   })
 
 export default function UserFormDailog({
@@ -64,12 +65,29 @@ export default function UserFormDailog({
   })
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>): void {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+  async function onSubmit(values: z.infer<typeof formSchema>): Promise<void> {
+    const user: User = {
+      username: values.username,
+      password: values.password,
+      phone: values.phone,
+      permission: Number(values.permission)
+    }
+    const a = await window.api.insertUser(user)
+    console.log(a)
+
     HandleCloseDialog()
   }
+
+  const [permissions, setPermissions] = useState<Permissions[]>([])
+  useEffect(() => {
+    const pyfun = async (): Promise<void> => {
+      const data = await window.api.getPermissions()
+      console.log(data)
+
+      setPermissions(data)
+    }
+    pyfun()
+  }, [])
 
   return (
     <Form {...form}>
@@ -148,9 +166,12 @@ export default function UserFormDailog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="admin">admin</SelectItem>
-                      <SelectItem value="seller">seller</SelectItem>
-                      <SelectItem value="counter">counter</SelectItem>
+                      {permissions &&
+                        permissions.map((permission) => (
+                          <SelectItem key={permission.id} value={permission.id.toString()}>
+                            {permission.name}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   <FormDescription>You can manage email addresses in your </FormDescription>

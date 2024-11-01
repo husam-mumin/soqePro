@@ -4,6 +4,7 @@ import Sale from './pages/Sale'
 import StroagePage from './pages/Storage'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import Setting from './pages/Setting'
+import InsertItemFrom from './pages/Storage/page/InsertItemFrom'
 
 function App(): JSX.Element {
   return (
@@ -11,7 +12,8 @@ function App(): JSX.Element {
       <MainLayout>
         <Routes>
           <Route index Component={Home} path="/" />
-          <Route Component={Sale} path="/Sale" />
+          <Route path="/Sale" Component={Sale} />
+          <Route Component={InsertItemFrom} path="/Storage/insertItemFrom" />
           <Route Component={StroagePage} path="/Storage" />
           <Route Component={Setting} path="/setting" />
         </Routes>

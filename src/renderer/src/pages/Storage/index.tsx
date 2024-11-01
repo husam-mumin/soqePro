@@ -1,58 +1,142 @@
-import { ToggleGroupItem } from '@radix-ui/react-toggle-group'
+import Searchbox from './components/Searchbox'
+import CategorySectoin from './components/CategorySectoin'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@renderer/components/ui/button'
+import { List, Plus } from 'lucide-react'
+import { ReactElementType } from '@renderer/types/ReactElementType'
+import { Toggle } from '@renderer/components/ui/toggle'
+import ListItem from './components/ListItem'
+import { useNavigate } from 'react-router-dom'
+import { showProduct } from 'src/models/products'
 import { ScrollArea } from '@renderer/components/ui/scrollArea'
-import { ToggleGroup } from '@renderer/components/ui/toggleGroup'
-import { set } from 'date-fns'
-import { IceCreamCone, LucideProps, PlusIcon } from 'lucide-react'
-import { ForwardRefExoticComponent, RefAttributes, useState } from 'react'
+import { DataTable } from '@renderer/components/data-table'
+import { getDate } from 'date-fns'
+import { getProductCulumns } from './components/productTable/column'
+import useConfirmationStore from './components/confirmationStore'
+import { Input } from '@renderer/components/ui/input'
 
-type CategoryType = {
-  Icon?: JSX.Element
+export type prodcutType = {
+  id: number
   name: string
+  price: number
   quantity: number
-  CategoryId: number
+  imagePath: string
+  sizes: string[]
+  color: string[]
+  category: string
 }
 
-const CategoryList: CategoryType[] = [
-  {
-    Icon: <IceCreamCone />,
-    name: 'man',
-    quantity: 5,
-    CategoryId: 1
-  }
-]
+export type StoragePageProps = ReactElementType
 
-export default function StroagePage(): JSX.Element {
+function muckdata() {}
+
+export default function StroagePage({}: StoragePageProps): JSX.Element {
   const [selectCotegory, setSelectCotegory] = useState<string[]>([])
+  const [search, setSearch] = useState<string>('')
+  const [filterData, setFilterData] = useState<showProduct[]>([])
+  const [datas, setDatas] = useState<showProduct[]>([])
+  const [labelNumber, setlabelNumber] = useState(0)
+  const nav = useNavigate()
+  const { openConfirmation } = useConfirmationStore()
+
+  async function getdata(): Promise<void> {
+    const products = await window.api.getShowProducts()
+    console.log(products)
+
+    setDatas(products)
+  }
+
+  useEffect(() => {
+    getdata()
+  }, [])
+
+  useEffect(() => {
+    console.log(datas)
+    console.log('search ' + search)
+
+    if (search == '') {
+      console.log('inter the if')
+
+      setFilterData(datas)
+      return
+    }
+    const searchText = new RegExp(search, 'g')
+    const data = datas.filter((item) => searchText.test(item.productname))
+    if (data) return
+    setFilterData(data)
+  }, [datas, search])
+
+  const onDelete = (id: number): void => {
+    window.api.deleteProduct(id)
+    getdata().then(() => {})
+  }
+
+  const onPrint = (product: showProduct) => {
+    const data: {
+      marketName?: string
+      copies: number
+      barcode: string
+      name: string
+      price: number
+    } = {
+      marketName: 'بن عمورة',
+      copies: labelNumber,
+      barcode: product.prodcut_code,
+      name: product.productname,
+      price: product.price
+    }
+
+    openConfirmation({
+      title: 'Print Label',
+      description: 'are you sure you want to print copis' + labelNumber,
+      cancelLabel: 'Cancel',
+      actionLabel: 'Print',
+      onAction: () => {
+        window.api.printLabel(data)
+      },
+      onCancel: () => {}
+    })
+  }
+  const columns = useMemo(() => getProductCulumns({ onDelete, onPrint }), [labelNumber])
   return (
-    <div className=" flex">
-      <div className="flex flex-col">
-        <div className="w-52  bg-secondary px-4 pt-5 flex-grow  overflow-hidden flex flex-col">
-          <h2 className="text-2xl font-bold mb-4">Category</h2>
-          <ScrollArea className=" grow max-h-[calc(100vh-10.5rem)] h-[calc(100vh-10.5rem)] ">
-            <ToggleGroup type="multiple">
-              {CategoryList.map((item) => (
-                <ToggleGroupItem
-                  value={item.CategoryId.toString()}
-                  key={item.CategoryId}
-                  className="w-full py-5 px-4 bg-slate-800 flex justify-between items-center"
-                >
-                  <div className="flex gap-2">
-                    {item.Icon} {item.name}
-                  </div>
-                  <div className="bg-slate-600 p-2 rounded-full size-6 text-[14px] flex justify-center items-center">
-                    {item.quantity}
-                  </div>
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-            <Button variant={'ghost'} className="w-full h-16 border-2 border-dashed mt-4">
-              <PlusIcon className="text-2xl !w-[2rem] !h-[2rem]" />
+    <div className="flex grow">
+      <CategorySectoin />
+      <div className="flex-grow">
+        <div>
+          <div className="flex gap-4">
+            <Searchbox setSearch={setSearch} className="ml-4 w-60" />
+            <Button
+              onClick={() => {
+                nav('/Storage/insertItemFrom')
+              }}
+            >
+              <Plus /> add
             </Button>
+            <Toggle
+              disabled
+              aria-label="Toggle List"
+              defaultPressed={true}
+              onPressedChange={() => {}}
+            >
+              <List />
+            </Toggle>
+          </div>
+          <ScrollArea className="max-h-[calc(100vh-10em)] mx-4 my-4">
+            <DataTable columns={columns} data={filterData} />
           </ScrollArea>
+          <div className="flex gap-2 items-center ml-4">
+            Copies
+            <Input
+              type="number"
+              value={labelNumber}
+              onChange={(e) => {
+                setlabelNumber(parseInt(e.target.value))
+              }}
+              className="w-12"
+            />
+          </div>
         </div>
       </div>
-      <div className="flex-grow"></div>
     </div>
   )
 }

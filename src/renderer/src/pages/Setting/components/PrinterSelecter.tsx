@@ -5,9 +5,16 @@ import {
   SelectTrigger,
   SelectValue
 } from '@renderer/components/ui/select'
+import { ReactElementType } from '@renderer/types/ReactElementType'
 import { useEffect, useState } from 'react'
-
-export default function PrinterSelecter(): JSX.Element {
+type PrinterSelecterProps = {
+  value: string
+  handleOnChange: (event) => void
+} & ReactElementType
+export default function PrinterSelecter({
+  value,
+  handleOnChange
+}: PrinterSelecterProps): JSX.Element {
   const [printers, setPrinters] = useState<string[]>()
   useEffect(() => {
     window.api.getPrinters().then((response) => {
@@ -15,8 +22,13 @@ export default function PrinterSelecter(): JSX.Element {
     })
   }, [])
   return (
-    <Select>
-      <SelectTrigger className="w-40 mt-8">
+    <Select
+      onValueChange={(e) => {
+        handleOnChange(e)
+      }}
+      value={value}
+    >
+      <SelectTrigger className="w-40 ">
         <SelectValue placeholder="Select Printer" />
       </SelectTrigger>
       <SelectContent>
