@@ -8,23 +8,22 @@ import {
   FormItem,
   FormLabel,
   FormMessage
-} from '@renderer/components/ui/form'
+} from '@/renderer/components/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { User } from '@renderer/pages/Setting/components/UserTable/column'
-import { Input } from '@renderer/components/ui/input'
-import { Button } from '@renderer/components/ui/button'
+import { User } from '@/renderer/pages/Setting/components/UserTable/column'
+import { Input } from '@/renderer/components/ui/input'
+import { Button } from '@/renderer/components/ui/button'
 import Combobox from './Combobox'
 import { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
-import { Label } from '@renderer/components/ui/label'
-import { product } from 'src/models/products'
-import { toast } from '@renderer/components/hooks/use-toast'
-import { useNavigate } from 'react-router-dom'
+import { Popover, PopoverContent, PopoverTrigger } from '@/renderer/components/ui/popover'
+import { Label } from '@/renderer/components/ui/label'
+import { product, provider } from 'src/models/products'
+import { toast } from '@/renderer/components/hooks/use-toast'
 
 const formSchema = z.object({
   name: z.string().min(4, {
-    message: 'Product must be at least 4 characters.'
+    message: 'المنتج يجب ان يكون من اربع احرف'
   }),
   price: z.string(),
   providerId: z.number(),
@@ -77,12 +76,10 @@ export default function InsertItemFrom({ category }): JSX.Element {
       if (!result) {
         return gentretyProductCode()
       }
-
-      console.log(result)
     })
     return productCode
   }
-  async function onSubmit(values: z.infer<typeof formSchema>): void {
+  async function onSubmit(values: z.infer<typeof formSchema>): Promise<void> {
     const user = await getAuthUser()
 
     if (!user.id) return
@@ -97,7 +94,7 @@ export default function InsertItemFrom({ category }): JSX.Element {
     }
     window.api.insertProduct(insertProduct)
     toast({
-      title: 'Added Product succufuley'
+      title: 'اضف منتج بنجاح'
     })
     history.back()
   }
@@ -136,243 +133,248 @@ export default function InsertItemFrom({ category }): JSX.Element {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Product Name</FormLabel>
+                <FormLabel>اسم المنتج</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter Name" {...field} />
+                  <Input placeholder="شخشير اسود" {...field} />
                 </FormControl>
-                <FormDescription>name of the Product</FormDescription>
+                <FormDescription></FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
+          <div className="flex gap-6">
+            <div>
+              <FormField
+                control={form.control}
+                name="categoryId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>تصنيف</FormLabel>
+                    <FormControl className="">
+                      <Combobox
+                        values={catego ? catego.name : ''}
+                        data={categories}
+                        className="flex"
+                        setCateogry={setCategory}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription></FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <FormField
-            control={form.control}
-            name="categoryId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>category name</FormLabel>
-                <FormControl className="">
-                  <Combobox
-                    values={catego ? catego.name : ''}
-                    data={categories}
-                    className="flex"
-                    setCateogry={setCategory}
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>name of the Product</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>سعر</FormLabel>
+                    <FormControl>
+                      <Input placeholder="20" type="number" {...field} />
+                    </FormControl>
+                    <FormDescription></FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="brandId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ماركة</FormLabel>
+                    <div className="flex gap-2">
+                      <FormControl className="">
+                        <Combobox
+                          data={brands}
+                          values={brand ? brand.name : ''}
+                          className="flex"
+                          setCateogry={setBrand}
+                          {...field}
+                        />
+                      </FormControl>
 
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>prodcut price</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter Price" type="number" {...field} />
-                </FormControl>
-                <FormDescription>Price for sale</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="brandId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Brand Name</FormLabel>
-                <div className="flex gap-2">
-                  <FormControl className="">
-                    <Combobox
-                      data={brands}
-                      values={brand ? brand.name : ''}
-                      className="flex"
-                      setCateogry={setBrand}
-                      {...field}
-                    />
-                  </FormControl>
-
-                  <Popover open={addBrandOpen} onOpenChange={() => setAddBrandOpen(!addBrandOpen)}>
-                    <PopoverTrigger asChild>
-                      <Button type="button" variant={'ghost'} size={'icon'}>
-                        <Plus />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80">
-                      <div className="grid gap-3">
-                        <div className="space-y-2">
-                          <h4 className="font-medium leading-none">add Category</h4>
-                        </div>
-                        <div className="grid gap-2">
-                          <div className="grid grid-cols-3 items-center ">
-                            <Label htmlFor="CategoryName" className="text-sm">
-                              Name
-                            </Label>
-                            <Input
-                              id="CategoryName"
-                              placeholder="Enter the name"
-                              className="col-span-2 h-8"
-                              value={brandName}
-                              onChange={(e) => setBrandName(e.target.value)}
-                            />
-                          </div>
-                          <Button
-                            onClick={() => {
-                              if (!brandName) return
-                              window.api
-                                .insertBrand(brandName)
-                                .then((e) => {
-                                  if (!e) return
-                                  console.log(e)
-
-                                  setBrands(() => [...brands, e])
-
-                                  setAddBrandOpen(false)
-                                  setBrandName('')
-                                  setBrand(e)
-                                })
-                                .catch((error) => {
-                                  console.log(error)
-                                  setAddBrandOpen(false)
-                                })
-                            }}
-                          >
-                            add
+                      <Popover
+                        open={addBrandOpen}
+                        onOpenChange={() => setAddBrandOpen(!addBrandOpen)}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button type="button" variant={'ghost'} size={'icon'}>
+                            <Plus />
                           </Button>
-                        </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <FormDescription>name of the Product</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                          <div className="grid gap-3">
+                            <div className="space-y-2">
+                              <h4 className="font-medium leading-none">اضاقة تصنيف</h4>
+                            </div>
+                            <div className="grid gap-2">
+                              <div className="grid grid-cols-3 items-center ">
+                                <Label htmlFor="CategoryName" className="text-sm">
+                                  الاسم
+                                </Label>
+                                <Input
+                                  id="CategoryName"
+                                  placeholder="رجالي"
+                                  className="col-span-2 h-8"
+                                  value={brandName}
+                                  onChange={(e) => setBrandName(e.target.value)}
+                                />
+                              </div>
+                              <Button
+                                onClick={() => {
+                                  if (!brandName) return
+                                  window.api
+                                    .insertBrand(brandName)
+                                    .then((e) => {
+                                      if (!e) return
 
-          <FormField
-            control={form.control}
-            name="cost"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Cost</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter the cost" type="number" {...field} />
-                </FormControl>
-                <FormDescription>Cost</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                                      setBrands(() => [...brands, e])
 
-          <FormField
-            control={form.control}
-            name="quantity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Quantity</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter the quantity" type="number" {...field} />
-                </FormControl>
-                <FormDescription>Quantity</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="providerId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Provder Name</FormLabel>
-                <div className="flex gap-2">
-                  <FormControl className="">
-                    <Combobox
-                      data={providers}
-                      values={provider.name ? provider.name : ''}
-                      className="flex"
-                      setCateogry={setProvider}
-                      {...field}
-                    />
-                  </FormControl>
-
-                  <Popover
-                    open={addProviderOpen}
-                    onOpenChange={() => setAddProviderOpen(!addProviderOpen)}
-                  >
-                    <PopoverTrigger asChild>
-                      <Button type="button" variant={'ghost'} size={'icon'}>
-                        <Plus />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80">
-                      <div className="grid gap-3">
-                        <div className="space-y-2">
-                          <h4 className="font-medium leading-none">add Provider</h4>
-                        </div>
-                        <div className="grid gap-2">
-                          <div className="grid grid-cols-3 items-center gap-2 ">
-                            <Label htmlFor="ProviderName" className="text-sm">
-                              Name
-                            </Label>
-                            <Input
-                              id="ProviderName"
-                              placeholder="Enter the name"
-                              className="col-span-2 h-8"
-                              value={provider.name}
-                              onChange={(e) => setProvider({ ...provider, name: e.target.value })}
-                            />
-
-                            <Label htmlFor="ProviderPhone" className="text-sm">
-                              Phone
-                            </Label>
-                            <Input
-                              id="ProviderPhone"
-                              placeholder="Enter the name"
-                              className="col-span-2 h-8"
-                              value={provider.phone}
-                              onChange={(e) => setProvider({ ...provider, phone: e.target.value })}
-                            />
+                                      setAddBrandOpen(false)
+                                      setBrandName('')
+                                      setBrand(e)
+                                    })
+                                    .catch((error) => {
+                                      setAddBrandOpen(false)
+                                    })
+                                }}
+                              >
+                                اضافة
+                              </Button>
+                            </div>
                           </div>
-                          <Button
-                            onClick={() => {
-                              if (!provider.name) return
-                              window.api
-                                .insertProvider(provider)
-                                .then((e) => {
-                                  if (!e) return
-                                  setProviders((i) => [...i, e])
-                                  setAddProviderOpen(false)
-                                  setProvider(e)
-                                })
-                                .catch((error) => {
-                                  console.log(error)
-                                  setAddBrandOpen(false)
-                                })
-                            }}
-                          >
-                            add
-                          </Button>
-                        </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <FormDescription>name of the Product</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <FormDescription></FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div>
+              <FormField
+                control={form.control}
+                name="cost"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>تكلفة</FormLabel>
+                    <FormControl>
+                      <Input placeholder="60" type="number" {...field} />
+                    </FormControl>
+                    <FormDescription></FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <Button type="submit">save</Button>
+              <FormField
+                control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>الكمية</FormLabel>
+                    <FormControl>
+                      <Input placeholder="12" type="number" {...field} />
+                    </FormControl>
+                    <FormDescription></FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="providerId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>اسم الموزع</FormLabel>
+                    <div className="flex gap-2">
+                      <FormControl className="">
+                        <Combobox
+                          data={providers}
+                          values={provider.name ? provider.name : ''}
+                          className="flex"
+                          setCateogry={setProvider}
+                          {...field}
+                        />
+                      </FormControl>
+
+                      <Popover
+                        open={addProviderOpen}
+                        onOpenChange={() => setAddProviderOpen(!addProviderOpen)}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button type="button" variant={'ghost'} size={'icon'}>
+                            <Plus />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                          <div className="grid gap-3">
+                            <div className="space-y-2">
+                              <h4 className="font-medium leading-none">اضافة موزع</h4>
+                            </div>
+                            <div className="grid gap-2">
+                              <div className="grid grid-cols-3 items-center gap-2 ">
+                                <Label htmlFor="ProviderName" className="text-sm">
+                                  اسم
+                                </Label>
+                                <Input
+                                  id="ProviderName"
+                                  placeholder="عبد الرحمن"
+                                  className="col-span-2 h-8"
+                                  value={provider.name}
+                                  onChange={(e) =>
+                                    setProvider({ ...provider, name: e.target.value })
+                                  }
+                                />
+
+                                <Label htmlFor="ProviderPhone" className="text-sm">
+                                  رقم
+                                </Label>
+                                <Input
+                                  id="ProviderPhone"
+                                  placeholder="091xxxxxx"
+                                  className="col-span-2 h-8"
+                                  value={provider.phone}
+                                  onChange={(e) =>
+                                    setProvider({ ...provider, phone: e.target.value })
+                                  }
+                                />
+                              </div>
+                              <Button
+                                onClick={() => {
+                                  if (!provider.name) return
+                                  window.api
+                                    .insertProvider(provider)
+                                    .then((e) => {
+                                      if (!e) return
+                                      setProviders((i) => [...i, e])
+                                      setAddProviderOpen(false)
+                                      setProvider(e)
+                                    })
+                                    .catch((error) => {
+                                      setAddBrandOpen(false)
+                                    })
+                                }}
+                              >
+                                اضافة
+                              </Button>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <FormDescription></FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+          <Button type="submit">حفظ</Button>
         </form>
       </Form>
     </div>

@@ -11,14 +11,13 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table'
 import { useEffect, useState } from 'react'
 import { Input } from './ui/input'
-import { showProduct } from 'src/models/products'
 import { Product } from 'electron'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
-  onDelete?: (id: number) => Product
-  onEdit?: (id: Product) => Product
+  onDelete?: (id: number) => void
+  onEdit?: (id: Product) => void
 }
 
 export function DataTable<TData, TValue>({
@@ -59,15 +58,17 @@ export function DataTable<TData, TValue>({
   return (
     <>
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-          onChange={(event) => {
-            table.getColumn('name')?.setFilterValue(event.target.value)
-            table.getColumn('barcode')?.setFilterValue(event.target.value)
-          }}
-          className="max-w-sm"
-        />
+        {table.getColumn('name') && (
+          <Input
+            placeholder="بحث"
+            value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
+            onChange={(event) => {
+              table.getColumn('name')?.setFilterValue(event.target.value)
+              table.getColumn('barcode')?.setFilterValue(event.target.value)
+            }}
+            className="max-w-sm"
+          />
+        )}
       </div>
       <div className="rounded-md border">
         <Table>
@@ -100,7 +101,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  لا منتجات
                 </TableCell>
               </TableRow>
             )}

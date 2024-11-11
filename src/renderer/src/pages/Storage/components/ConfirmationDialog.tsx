@@ -9,7 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle
-} from '@renderer/components/ui/AlertDialog'
+} from '@/renderer/components/ui/AlertDialog'
 import useConfirmationStore from './confirmationStore'
 
 const ConfirmationDialog = () => {

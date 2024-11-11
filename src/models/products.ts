@@ -62,7 +62,7 @@ export type showProduct = {
   productname: string
   brandname: string
   cost: number
-  price: number
+  price: string
   prodcut_code: string
   quantity: number
   username: string

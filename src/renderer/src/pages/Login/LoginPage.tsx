@@ -1,10 +1,10 @@
-import { Button } from '@renderer/components/ui/button'
+import { Button } from '@/renderer/components/ui/button'
 import '../../assets/main.css'
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { ThemeProvider } from '@renderer/components/theme-provider'
-import { Card, CardContent, CardFooter, CardHeader } from '@renderer/components/ui/card'
-import { Input } from '@renderer/components/ui/input'
+import { ThemeProvider } from '@/renderer/components/theme-provider'
+import { Card, CardContent, CardFooter, CardHeader } from '@/renderer/components/ui/card'
+import { Input } from '@/renderer/components/ui/input'
 import { User } from '../Setting/components/UserTable/column'
 
 export default function LoginPage(): JSX.Element {
@@ -12,7 +12,7 @@ export default function LoginPage(): JSX.Element {
   return (
     <div className="h-screen w-screen flex justify-center items-center">
       <Card>
-        <CardHeader>Login</CardHeader>
+        <CardHeader>تسجيل دخول</CardHeader>
         <CardContent className="flex flex-col gap-5">
           <Input
             type="text"
@@ -22,7 +22,7 @@ export default function LoginPage(): JSX.Element {
               })
             }
             name="username"
-            placeholder="Username"
+            placeholder="اسم المستخدم"
           />
           <Input
             type="password"
@@ -32,19 +32,17 @@ export default function LoginPage(): JSX.Element {
               })
             }
             name="password"
-            placeholder="Password"
+            placeholder="رمز الدخول"
           />
         </CardContent>
         <CardFooter>
           <Button
             onClick={() => {
-              console.log(user)
-
               window.login.login(user)
             }}
             className="mt-6"
           >
-            Login
+            تسجيل دخول
           </Button>
         </CardFooter>
       </Card>

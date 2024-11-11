@@ -1,7 +1,7 @@
+import { usePermissionConverter } from '../../../../lib/usePermissionConverter'
 import { ColumnDef } from '@tanstack/react-table'
 import TimeAgo from 'javascript-time-ago'
 import ar from 'javascript-time-ago/locale/en'
-import { usePermissionConverter } from '@renderer/lib/usePermissionConverter'
 
 export type User = {
   id?: number
@@ -19,15 +19,16 @@ export const columns: () => ColumnDef<User>[] = () => {
   return [
     {
       accessorKey: 'username',
-      header: 'Username'
+      header: 'اسم المستخدم',
+      id: 'name'
     },
     {
       accessorKey: 'phone',
-      header: 'Phone'
+      header: 'رقم الهاتف'
     },
     {
       accessorKey: 'lastLogin',
-      header: 'last Login',
+      header: 'اخر تسجيل دخول',
       cell: (item) => (
         <div>
           {item.row.getValue<Date>('lastLogin')
@@ -38,7 +39,7 @@ export const columns: () => ColumnDef<User>[] = () => {
     },
     {
       accessorKey: 'permission',
-      header: 'Permission',
+      header: 'صلاحية',
       cell: (item) => <div>{usePermissionConverter(item.row.getValue<number>('permission'))}</div>
     }
   ]

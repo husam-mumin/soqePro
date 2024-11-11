@@ -1,6 +1,5 @@
 import { pool } from '../data/db'
 import { AuthUesr, permission, User_type } from '../../models/user'
-import { Size } from '../../models/products'
 
 export async function getUsers(): Promise<User_type[]> {
   const data = await pool.query<User_type>('SELECT * FROM users')

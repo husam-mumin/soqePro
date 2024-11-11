@@ -1,8 +1,8 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button } from '@renderer/components/ui/button'
-import { DialogClose, DialogFooter } from '@renderer/components/ui/dialog'
+import { Button } from '@/renderer/components/ui/button'
+import { DialogClose, DialogFooter } from '@/renderer/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -11,15 +11,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage
-} from '@renderer/components/ui/form'
-import { Input } from '@renderer/components/ui/input'
+} from '@/renderer/components/ui/form'
+import { Input } from '@/renderer/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from '@renderer/components/ui/select'
+} from '@/renderer/components/ui/select'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { User } from '../UserTable/column'
@@ -33,17 +33,17 @@ export type Permissions = {
 const formSchema = z
   .object({
     username: z.string().min(2, {
-      message: 'Username must be at least 2 characters.'
+      message: 'يجب ان يكون المستخدم من حرفين علي الاقل'
     }),
     password: z.string().min(6, {
-      message: 'Password must be at least 6 characters.'
+      message: 'يجب ان يتكون الرمز من 6 حروف '
     }),
     confirm: z.string(),
     phone: z.string(),
     permission: z.string()
   })
   .refine((data) => data.password == data.confirm, {
-    message: "Password don't match",
+    message: 'لا يتطبق الرمز',
     path: ['confirm']
   })
 
@@ -73,7 +73,6 @@ export default function UserFormDailog({
       permission: Number(values.permission)
     }
     const a = await window.api.insertUser(user)
-    console.log(a)
 
     HandleCloseDialog()
   }
@@ -82,7 +81,6 @@ export default function UserFormDailog({
   useEffect(() => {
     const pyfun = async (): Promise<void> => {
       const data = await window.api.getPermissions()
-      console.log(data)
 
       setPermissions(data)
     }
@@ -97,11 +95,11 @@ export default function UserFormDailog({
           name="username"
           render={({ field }) => (
             <FormItem className="w-[15rem]">
-              <FormLabel>Username</FormLabel>
+              <FormLabel>اسم المستخدم</FormLabel>
               <FormControl>
-                <Input placeholder="User Name" {...field} />
+                <Input placeholder="hassankaled" {...field} />
               </FormControl>
-              <FormDescription>This is your public display name.</FormDescription>
+              <FormDescription></FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -113,11 +111,11 @@ export default function UserFormDailog({
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>رمز المرور</FormLabel>
                   <FormControl>
-                    <Input placeholder="Password" type="password" {...field} />
+                    <Input placeholder="xswe312314" type="password" {...field} />
                   </FormControl>
-                  <FormDescription>This is your password</FormDescription>
+                  <FormDescription></FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -127,11 +125,11 @@ export default function UserFormDailog({
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel>رقم الهاتف</FormLabel>
                   <FormControl>
-                    <Input placeholder="Phone Number" {...field} />
+                    <Input placeholder="09xxxxxxxx" {...field} />
                   </FormControl>
-                  <FormDescription>Your Phone Number</FormDescription>
+                  <FormDescription></FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -143,11 +141,11 @@ export default function UserFormDailog({
               name="confirm"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel>تاكيد رمز المرور</FormLabel>
                   <FormControl>
-                    <Input placeholder="Confirm Password" type="password" {...field} />
+                    <Input placeholder="xswe312314" type="password" {...field} />
                   </FormControl>
-                  <FormDescription>rewrite your password</FormDescription>
+                  <FormDescription></FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -158,11 +156,11 @@ export default function UserFormDailog({
               name="permission"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Permission</FormLabel>
+                  <FormLabel>الصلاحيات</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select the Permission Type" />
+                        <SelectValue placeholder="اختار احد الصلاحيات" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -174,20 +172,20 @@ export default function UserFormDailog({
                         ))}
                     </SelectContent>
                   </Select>
-                  <FormDescription>You can manage email addresses in your </FormDescription>
+                  <FormDescription>اختار احدا الصلاحيات</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex rtl:flex-row-reverse gap-4">
           <DialogClose asChild>
             <Button type="button" variant={'secondary'}>
-              Close
+              اغلاق
             </Button>
           </DialogClose>
-          <Button type="submit">Submit</Button>
+          <Button type="submit">حفظ</Button>
         </DialogFooter>
       </form>
     </Form>

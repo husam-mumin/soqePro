@@ -4,14 +4,14 @@ import {
   CardDescription,
   CardHeader,
   CardTitle
-} from '@renderer/components/ui/card'
+} from '@/renderer/components/ui/card'
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent
-} from '@renderer/components/ui/char'
-import { ReactElementType } from '@renderer/types/ReactElementType'
+} from '@/renderer/components/ui/char'
+import { ReactElementType } from '@/renderer/types/ReactElementType'
 import * as React from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 
@@ -143,8 +143,8 @@ export function Main_Char({ className }: ReactElementType): JSX.Element {
     >
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle>Bar Chart - Interactive</CardTitle>
-          <CardDescription>Showing total visitors for the last 3 months</CardDescription>
+          <CardTitle>المبيعات</CardTitle>
+          <CardDescription>المبيعات اليومية</CardDescription>
         </div>
         <div className="flex">
           {['desktop', 'mobile'].map((key) => {

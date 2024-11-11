@@ -1,19 +1,17 @@
 import Searchbox from './components/Searchbox'
 import CategorySectoin from './components/CategorySectoin'
 import { useEffect, useMemo, useState } from 'react'
-import { Button } from '@renderer/components/ui/button'
+import { Button } from '@/renderer/components/ui/button'
 import { List, Plus } from 'lucide-react'
-import { ReactElementType } from '@renderer/types/ReactElementType'
-import { Toggle } from '@renderer/components/ui/toggle'
-import ListItem from './components/ListItem'
+import { ReactElementType } from '@/renderer/types/ReactElementType'
+import { Toggle } from '@/renderer/components/ui/toggle'
 import { useNavigate } from 'react-router-dom'
 import { showProduct } from 'src/models/products'
-import { ScrollArea } from '@renderer/components/ui/scrollArea'
-import { DataTable } from '@renderer/components/data-table'
-import { getDate } from 'date-fns'
+import { ScrollArea } from '@/renderer/components/ui/scrollArea'
+import { DataTable } from '@/renderer/components/data-table'
 import { getProductCulumns } from './components/productTable/column'
 import useConfirmationStore from './components/confirmationStore'
-import { Input } from '@renderer/components/ui/input'
+import { Input } from '@/renderer/components/ui/input'
 
 export type prodcutType = {
   id: number
@@ -28,8 +26,6 @@ export type prodcutType = {
 
 export type StoragePageProps = ReactElementType
 
-function muckdata() {}
-
 export default function StroagePage({}: StoragePageProps): JSX.Element {
   const [selectCotegory, setSelectCotegory] = useState<string[]>([])
   const [search, setSearch] = useState<string>('')
@@ -41,7 +37,6 @@ export default function StroagePage({}: StoragePageProps): JSX.Element {
 
   async function getdata(): Promise<void> {
     const products = await window.api.getShowProducts()
-    console.log(products)
 
     setDatas(products)
   }
@@ -51,12 +46,7 @@ export default function StroagePage({}: StoragePageProps): JSX.Element {
   }, [])
 
   useEffect(() => {
-    console.log(datas)
-    console.log('search ' + search)
-
     if (search == '') {
-      console.log('inter the if')
-
       setFilterData(datas)
       return
     }
@@ -77,7 +67,7 @@ export default function StroagePage({}: StoragePageProps): JSX.Element {
       copies: number
       barcode: string
       name: string
-      price: number
+      price: string
     } = {
       marketName: 'بن عمورة',
       copies: labelNumber,
@@ -87,10 +77,10 @@ export default function StroagePage({}: StoragePageProps): JSX.Element {
     }
 
     openConfirmation({
-      title: 'Print Label',
-      description: 'are you sure you want to print copis' + labelNumber,
-      cancelLabel: 'Cancel',
-      actionLabel: 'Print',
+      title: 'طباعة ملصق',
+      description: 'هل انت متاكد من طباعة ملصق بعدد ' + labelNumber,
+      cancelLabel: 'الغاء',
+      actionLabel: 'طباعة',
       onAction: () => {
         window.api.printLabel(data)
       },
@@ -104,13 +94,13 @@ export default function StroagePage({}: StoragePageProps): JSX.Element {
       <div className="flex-grow">
         <div>
           <div className="flex gap-4">
-            <Searchbox setSearch={setSearch} className="ml-4 w-60" />
+            <Searchbox setSearch={setSearch} className="mr-4 w-60" />
             <Button
               onClick={() => {
                 nav('/Storage/insertItemFrom')
               }}
             >
-              <Plus /> add
+              <Plus /> اضافة
             </Button>
             <Toggle
               disabled
@@ -124,8 +114,8 @@ export default function StroagePage({}: StoragePageProps): JSX.Element {
           <ScrollArea className="max-h-[calc(100vh-10em)] mx-4 my-4">
             <DataTable columns={columns} data={filterData} />
           </ScrollArea>
-          <div className="flex gap-2 items-center ml-4">
-            Copies
+          <div className="flex gap-2 items-center mr-4">
+            نسخ
             <Input
               type="number"
               value={labelNumber}

@@ -16,26 +16,26 @@ export default defineConfig({
       rollupOptions: {
         input: {
           index: join(__dirname, './src/preload/index.ts'),
-          login: join(__dirname, './src/preload/login/login.ts'),
-          label: join(__dirname, './src/preload/static/label.ts')
+          login: join(__dirname, './src/preload/login/login.ts')
         }
       }
     },
     plugins: [externalizeDepsPlugin()]
   },
   renderer: {
+    publicDir: join(__dirname, './src/renderer/src/public'),
     build: {
+      copyPublicDir: true,
       rollupOptions: {
         input: {
           index: join(__dirname, './src/renderer/index.html'),
-          login: join(__dirname, './src/renderer/login.html'),
-          label: join(__dirname, './src/renderer/static/label.html')
+          login: join(__dirname, './src/renderer/login.html')
         }
       }
     },
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src')
+        '@/renderer': resolve('src/renderer/src')
       }
     },
     plugins: [react()]

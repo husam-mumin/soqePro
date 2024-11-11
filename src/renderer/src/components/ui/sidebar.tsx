@@ -517,6 +517,7 @@ const SidebarMenuButton = React.forwardRef<
     asChild?: boolean
     isActive?: boolean
     tooltip?: string | React.ComponentProps<typeof TooltipContent>
+    disbaled?: boolean
     url?: string | undefined
   } & VariantProps<typeof sidebarMenuButtonVariants>
 >(
@@ -529,6 +530,7 @@ const SidebarMenuButton = React.forwardRef<
       tooltip,
       className,
       url,
+      disbaled,
       ...props
     },
     ref
@@ -538,6 +540,7 @@ const SidebarMenuButton = React.forwardRef<
 
     const button = (
       <Comp
+        disabled={disbaled}
         ref={ref}
         data-sidebar="menu-button"
         data-size={size}

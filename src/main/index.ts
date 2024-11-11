@@ -21,7 +21,15 @@ import {
 
 import { PosPrinter, PosPrintData, PosPrintOptions } from 'electron-pos-printer'
 import * as path from 'path'
+import {
+  getPaymentMethod,
+  insertorder,
+  insertorderProduct,
+  insertPaymentMethod
+} from './actions/order'
+import { orders } from '../models/sales'
 
+// defining backup file name
 async function LabelPrinter(data: {
   marketName?: string
   copies: number
@@ -92,10 +100,81 @@ async function LabelPrinter(data: {
       value: 'سعر:' + data.price
     }
   ]
+
   PosPrinter.print(ps, options)
     .then(console.log)
     .catch((error) => {
       console.error(error)
+    })
+}
+
+export type ReceiptType = {
+  username: string
+  products: string[][]
+  paymentinfomrtion: orders
+}
+
+async function printReceipt(data: ReceiptType): Promise<void> {
+  const defaultPrinter = await getDefaultPrinter()
+
+  const options: PosPrintOptions = {
+    preview: false,
+    margin: '0 0',
+    silent: true,
+    copies: 1,
+    boolean: true,
+    timeOutPerLine: 400,
+    printerName: defaultPrinter,
+    pageSize: { width: 252, height: 1200 },
+    printBackground: true // page size
+  }
+
+  const total = 0
+  data.paymentinfomrtion.customerID == 0
+
+  const date: string = data.paymentinfomrtion.entryat
+    ? data.paymentinfomrtion.entryat?.toLocaleString()
+    : new Date().toLocaleString()
+  if (!data.products) return
+  const dataprint: PosPrintData[] = [
+    {
+      type: 'text',
+      value: 'بن عمورة',
+      style: { textAlign: 'center', fontSize: '24px', fontWeight: 'bold' }
+    },
+    {
+      type: 'text',
+      value: data.username + ': المستخدم',
+      style: { textAlign: 'right', fontSize: '12px', fontWeight: 'bold' }
+    },
+    {
+      type: 'text',
+      value: data.paymentinfomrtion.id + ': فاتورة رقم',
+      style: { textAlign: 'right', fontSize: '12px', fontWeight: 'bold' }
+    },
+    {
+      type: 'text',
+      value: date + ': تاريخ',
+      style: { textAlign: 'right', fontSize: '12px', fontWeight: 'bold' }
+    },
+    {
+      type: 'table',
+      style: { border: '1px solid #ddd' },
+      tableHeader: ['الاسم', 'الكمية', 'السعر'],
+      tableBody: data.products,
+      tableFooter: ['مجموع', '-', total.toString()],
+      tableHeaderStyle: { backgroundColor: '#000', color: 'white' },
+      // custom style for the table body
+      tableBodyStyle: { border: '0.5px solid #ddd' },
+      // custom style for the table footer
+      tableFooterStyle: { backgroundColor: '#000', color: 'white' }
+    }
+  ]
+
+  PosPrinter.print(dataprint, options)
+    .then(console.log)
+    .catch((error) => {
+      console.log(error)
     })
 }
 async function setDefaultLabel(data): Promise<void> {
@@ -108,6 +187,18 @@ async function getDefaultLabel(): Promise<string> {
   if (!data) return ''
   if (typeof data == 'string') return data
   return ''
+}
+
+async function getDefaultPrinter(): Promise<string> {
+  const data = await settings.get('defaultPrinter.name')
+  if (!data) return ''
+  if (typeof data == 'string') return data
+  return ''
+}
+async function setdefaultPrinter(data: string): Promise<void> {
+  await settings.set('defaultPrinter', {
+    name: data
+  })
 }
 function createWindow(data: User_type): void {
   // Create the browser window.
@@ -141,6 +232,18 @@ function createWindow(data: User_type): void {
   ipcMain.removeHandler('getShowProducts')
   ipcMain.removeHandler('deleteProduct')
   ipcMain.removeHandler('getDefaultLabel')
+  ipcMain.removeHandler('getDefaultPrinter')
+  ipcMain.removeHandler('insertOrder')
+  ipcMain.removeHandler('insertOrderProduct')
+  ipcMain.removeHandler('insertPaymentMethod')
+  ipcMain.removeHandler('getPaymentMethod')
+  ipcMain.handle('getPaymentMethod', () => getPaymentMethod())
+  ipcMain.handle('insertOrder', (_, data) => insertorder(data))
+  ipcMain.handle('insertOrderProduct', (_, data) => insertorderProduct(data))
+  ipcMain.handle('insertPaymentMethod', (_, data) => insertPaymentMethod(data))
+  ipcMain.on('printReceipt', (_, data) => printReceipt(data))
+  ipcMain.handle('getDefaultPrinter', () => getDefaultPrinter())
+  ipcMain.on('setDefaultPrinter', (_, data) => setdefaultPrinter(data))
   ipcMain.on('printLabel', (_, data) => {
     LabelPrinter(data)
   })

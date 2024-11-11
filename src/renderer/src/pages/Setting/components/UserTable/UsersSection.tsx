@@ -1,4 +1,4 @@
-import { DataTable } from '@renderer/components/data-table'
+import { DataTable } from '@/renderer/components/data-table'
 import { columns, User } from './column'
 import { useEffect, useState } from 'react'
 
@@ -7,8 +7,6 @@ export default function UsersSection(): JSX.Element {
   useEffect(() => {
     function getdata(): void {
       window.api.getUsers().then((data) => {
-        console.log(data)
-
         setData(data)
       })
     }

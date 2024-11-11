@@ -2,7 +2,6 @@ import { pool } from '../data/db'
 import {
   brand,
   category,
-  colors,
   product,
   productGroup,
   provider,
@@ -42,15 +41,6 @@ export async function getProductGroup(id: number): Promise<productGroup> {
 }
 
 // get utlits
-export async function getsize_Groups(): Promise<size_group[]> {
-  const data = await pool.query<size_group>(`SELECT * FROM size_GROUP`)
-  return data.rows
-}
-
-export async function getColors(): Promise<colors[]> {
-  const data = await pool.query<colors>(`SELECT * FROM color`)
-  return data.rows
-}
 
 export async function getBrands(): Promise<brand[]> {
   const data = await pool.query<brand>(`SELECT * FROM brand`)
@@ -70,24 +60,6 @@ export async function insertCategory(category: string): Promise<category[]> {
   } catch {
     return []
   }
-}
-
-export async function insertColor(color: colors): Promise<boolean> {
-  try {
-    await pool.query(`INSERT INTO color (name, hex) values ('${color.name}', '${color.hex}')`)
-    return true
-  } catch {
-    return false
-  }
-}
-
-export async function insertSizeGroup(sizeGroup: size_group): Promise<size_group> {
-  const size_GROUP = (
-    await pool.query<size_group>(
-      `INSERT INTO size_GROUP (name) values ('${sizeGroup.name}') returning *`
-    )
-  ).rows[0]
-  return size_GROUP
 }
 
 export async function insertBrand(brands: string): Promise<brand | null> {

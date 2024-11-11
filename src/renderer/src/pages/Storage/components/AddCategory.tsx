@@ -1,7 +1,7 @@
-import { Button } from '@renderer/components/ui/button'
-import { Input } from '@renderer/components/ui/input'
-import { Label } from '@renderer/components/ui/label'
-import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import { Button } from '@/renderer/components/ui/button'
+import { Input } from '@/renderer/components/ui/input'
+import { Label } from '@/renderer/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/renderer/components/ui/popover'
 
 export default function AddCategory(): JSX.Element {
   return (

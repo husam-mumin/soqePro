@@ -38,46 +38,51 @@ import {
   SidebarRail,
   SidebarTrigger
 } from '../components/ui/sidebar'
-import { ReactElementType } from '@renderer/types/ReactElementType'
+import { ReactElementType } from '@/renderer/types/ReactElementType'
 import { Link, useMatch } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { User } from '@renderer/pages/Setting/components/UserTable/column'
-import { usePermissionConverter } from '@renderer/lib/usePermissionConverter'
-import ConfirmationDialog from '@renderer/pages/Storage/components/ConfirmationDialog'
+import { User } from '@/renderer/pages/Setting/components/UserTable/column'
+import { usePermissionConverter } from '@/renderer/lib/usePermissionConverter'
+import ConfirmationDialog from '@/renderer/pages/Storage/components/ConfirmationDialog'
 // This is sample data.
 const data = {
   navMain: [
     {
-      title: 'Home',
+      title: 'صفحة الرئسية',
       url: '/',
       isActive: false,
-      icon: Home
+      icon: Home,
+      disabled: false
     },
     {
-      title: 'Sale',
+      title: 'البيعات',
       isActive: false,
       url: '/Sale',
-      icon: DollarSign
+      icon: DollarSign,
+      disabled: false
     },
     {
-      title: 'Storage',
+      title: 'المخزن',
       isActive: false,
       url: '/storage',
-      icon: Box
+      icon: Box,
+      disabled: false
     }
   ],
   navSecondary: [
     {
-      title: 'Support',
+      title: 'الدعم',
       url: '#',
       icon: LifeBuoy,
-      isActive: false
+      isActive: false,
+      disabled: true
     },
     {
-      title: 'Feedback',
+      title: 'تقييم',
       url: '#',
       icon: Send,
-      isActive: false
+      isActive: false,
+      disabled: true
     }
   ]
 }
@@ -94,13 +99,13 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
   return (
     <div className="max-w-screen">
       <SidebarProvider defaultOpen={false}>
-        <Sidebar collapsible="icon">
+        <Sidebar collapsible="icon" side="right">
           <SidebarHeader className="flex justify-center items-center">
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <h1 className="text-xl font-bold py-4">
-                    B<span className="">Ben Omora</span>
+                    <span>بن عمورة</span>
                   </h1>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -108,7 +113,7 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
           </SidebarHeader>
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>Pages</SidebarGroupLabel>
+              <SidebarGroupLabel>صفحات</SidebarGroupLabel>
               <SidebarMenu>
                 {data.navMain.map((item) => (
                   <SidebarMenuItem key={item.title}>
@@ -117,6 +122,7 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
                         url={item.url}
                         tooltip={item.title}
                         isActive={useMatch(item.url) ? true : false}
+                        disabled={item.disabled}
                       >
                         {item.icon && <item.icon />}
                         <span>{item.title}</span>
@@ -162,7 +168,7 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
                         <span className="truncate font-semibold">{user.username}</span>
                         <span className="truncate text-xs">{permission}</span>
                       </div>
-                      <ChevronsUpDown className="ml-auto size-4" />
+                      <ChevronsUpDown className="mr-auto size-4" />
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -172,14 +178,14 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
                     sideOffset={4}
                   >
                     <DropdownMenuLabel className="p-0 font-normal">
-                      <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                      <div className="flex rtl:flex-row-reverse items-center gap-2 px-1 py-1.5 text-left text-sm">
                         <Avatar className="h-8 w-8 rounded-lg">
                           <AvatarImage src={''} title={user.username} alt={user.username} />
                           <AvatarFallback className="rounded-lg">
                             {user.username && user.username[0].toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="grid flex-1 text-left text-sm leading-tight">
+                        <div className="grid flex-1 text-left rtl:text-right text-sm leading-tight">
                           <span className="truncate font-semibold">{user.username}</span>
                           {
                             // todo fix permission show Problem}
@@ -193,19 +199,19 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
                       <Link to={'/setting'}>
                         <DropdownMenuItem>
                           <Settings2 />
-                          Setting
+                          الاعدادت
                         </DropdownMenuItem>
                       </Link>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem disabled>
                         <BadgeCheck />
-                        Account
+                        حساب
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem disabled>
                         <Bell />
-                        Notifications
+                        الاشعارات
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
@@ -215,7 +221,7 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
                       }}
                     >
                       <LogOut />
-                      Log out
+                      تسجيل خروج
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -227,7 +233,7 @@ export default function Main_layout({ children }: ReactElementType): JSX.Element
         <SidebarInset>
           <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <nav className="flex items-center gap-2 px-4">
-              <SidebarTrigger className="-ml-1" />
+              <SidebarTrigger className="-mr-1" />
               <Separator orientation="vertical" className="mr-2 h-4" />
             </nav>
           </header>

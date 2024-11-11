@@ -4,8 +4,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue
-} from '@renderer/components/ui/select'
-import { ReactElementType } from '@renderer/types/ReactElementType'
+} from '@/renderer/components/ui/select'
+import { ReactElementType } from '@/renderer/types/ReactElementType'
 import { useEffect, useState } from 'react'
 type PrinterSelecterProps = {
   value: string

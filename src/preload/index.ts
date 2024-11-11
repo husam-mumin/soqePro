@@ -1,14 +1,7 @@
+import { orders, orderProduct, paymentMethod } from './../models/sales'
+import { User_type as User } from './../models/user'
 import { contextBridge, ipcRenderer } from 'electron'
-import {
-  brand,
-  category,
-  product,
-  provider,
-  showProduct,
-  Size,
-  size_group
-} from '../models/products'
-import { User } from '../renderer/src/pages/Setting/components/UserTable/column'
+import { brand, category, product, provider, showProduct } from '../models/products'
 
 if (!process.contextIsolated) {
   throw new Error('contextIsolated must be enabled in the BrowserWindow')
@@ -37,7 +30,16 @@ const api = {
   deleteProduct: (id: number): Promise<product> => ipcRenderer.invoke('deleteProduct', id),
   setDefaultLabel: (data: string): void => ipcRenderer.send('defaultLebal', data),
   getDefaultLabel: (): Promise<string> => ipcRenderer.invoke('getDefaultLabel'),
-  printLabel: (data): void => ipcRenderer.send('printLabel', data)
+  printLabel: (data): void => ipcRenderer.send('printLabel', data),
+  getDefaultPrinter: (): Promise<string> => ipcRenderer.invoke('getDefaultPrinter'),
+  setDefaultPrinter: (data: string): void => ipcRenderer.send('setDefaultPrinter', data),
+  insertOrder: (data): Promise<orders> => ipcRenderer.invoke('insertOrder', data),
+  insertOrderProduct: (data): Promise<orderProduct> =>
+    ipcRenderer.invoke('insertOrderProduct', data),
+  insertPaymentMethod: (data): Promise<paymentMethod> =>
+    ipcRenderer.invoke('insertPaymentMethod', data),
+  getPaymentMethod: (): Promise<paymentMethod[]> => ipcRenderer.invoke('getPaymentMethod'),
+  printReceipt: (data): void => ipcRenderer.send('printReceipt', data)
 }
 try {
   contextBridge.exposeInMainWorld('api', api)

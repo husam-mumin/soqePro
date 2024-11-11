@@ -5,9 +5,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from '@renderer/components/ui/dialog'
+} from '@/renderer/components/ui/dialog'
 import UserFormDailog from './Forms/UserForm'
-import { Button } from '@renderer/components/ui/button'
+import { Button } from '@/renderer/components/ui/button'
 import { useState } from 'react'
 
 export default function AddUserDialog(): JSX.Element {
@@ -19,12 +19,12 @@ export default function AddUserDialog(): JSX.Element {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button type="button">Add User</Button>
+        <Button type="button">اضافة مستخدم</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add User</DialogTitle>
-          <DialogDescription>this for add user for your POS</DialogDescription>
+          <DialogTitle>اضافة مستخدم</DialogTitle>
+          <DialogDescription>اضافة مستخدم الي البرنامج</DialogDescription>
         </DialogHeader>
         <UserFormDailog HandleCloseDialog={HandleCloseDalog} />
       </DialogContent>
