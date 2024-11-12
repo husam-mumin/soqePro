@@ -1,6 +1,16 @@
 # soqepro
 
-An Electron application with React and TypeScript
+note I Develop this app for learning perparesise
+
+
+a POS System with MongoDb Database
+
+I made this application for my Friend he want to open a cloths store 
+this application is gift for him.
+
+if you like this application you can do what every you want with it. 
+
+
 
 ## Recommended IDE Setup
 
